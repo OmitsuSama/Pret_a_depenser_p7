@@ -1,0 +1,8 @@
+pandas
+streamlit
+matplotlib
+sklearn
+joblib
+lightgbm
+altair
+plotly
