@@ -7,4 +7,3 @@ lightgbm
 altair
 plotly
 numpy
-pycaret
