@@ -1,7 +1,7 @@
-pandas
 streamlit
+pandas
 matplotlib
-sklearn
+scikit-learn
 joblib
 lightgbm
 altair
