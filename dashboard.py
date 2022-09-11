@@ -38,9 +38,11 @@ try:
         selected_features = [col for col in data.columns if col not in notimportant_features]
         
         X = X[selected_features]
+
+        prediction = model.predict(X)
                
         proba = model.predict_proba(X)
-        prediction = model.predict(X)
+        
 
         tab1, tab2, tab3, tab4 = st.tabs(["Avis", "Infos Clients", "Graphique", "Plus d'info"])
         with tab1:
