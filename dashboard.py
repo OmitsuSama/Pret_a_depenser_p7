@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import joblib
+import pickle
 from urllib.error import URLError
 import altair as alt
 import plotly.express as px  
@@ -29,7 +30,7 @@ try:
     if not id_client:
         st.error("Choisissez un id client.")
     else:
-        model = joblib.load(open('Model.joblib', 'rb'))
+        model = pickle.load(open('ModelClassifier.pkl', 'rb'))
         data = pd.read_csv('app_test.csv')
 
         X = data[data['SK_ID_CURR'] == id_client]
