@@ -41,6 +41,9 @@ try:
                
         proba = model.predict_proba(X)
         prediction = model.predict(X)
+
+        tab1, tab2, tab3, tab4 = st.tabs(["Avis", "Infos Clients", "Graphique", "Plus d'info"])
+
 except URLError as e:
     st.error(
         """
