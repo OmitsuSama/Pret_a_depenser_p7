@@ -25,4 +25,4 @@ Michaël vous a fourni des spécifications pour le dashboard interactif. Celui-c
 
 Lien :
 - Lien Github = https://github.com/OmitsuSama/Pret_a_depenser_p7
-- Lien Dashboard = 
+- Lien Dashboard = https://omitsusama-pret-a-depenser-p7-dashboard-1y6vqr.streamlitapp.com/
