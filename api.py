@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "Bienvenue, L'API est opérationnelle..."
+    return "Bienvenue, L'API est opérationnelle... tapez /prediction_credit/{id_dun_client}"
 
 @app.route('/prediction_credit/<id_client>')  #, methods=['GET'])
 def prediction_credit(id_client):
