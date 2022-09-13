@@ -31,25 +31,27 @@ try:
     )
     if id_client:
         
-        model = pickle.load(open('ModelClassifier.pkl', 'rb'))
+        # model = pickle.load(open('ModelClassifier.pkl', 'rb'))
+        # data = pd.read_csv('app_test.csv')
+
+        # X = data[data['SK_ID_CURR'] == id_client]
+        
+        # notimportant_features = ['SK_ID_CURR', 'INDEX', 'TARGET']
+        # selected_features = [col for col in data.columns if col not in notimportant_features]
+        
+        # X = X[selected_features]
+
+        # prediction = model.predict(X)
+               
+        # proba = model.predict_proba(X)
+
         data = pd.read_csv('app_test.csv')
 
-        X = data[data['SK_ID_CURR'] == id_client]
-        
-        notimportant_features = ['SK_ID_CURR', 'INDEX', 'TARGET']
-        selected_features = [col for col in data.columns if col not in notimportant_features]
-        
-        X = X[selected_features]
+        with urllib.request.urlopen(f"https://ocp7-assia-latti.herokuapp.com/prediction_credit/{id_client}") as url:
+            X = json.loads(url.read())
 
-        prediction = model.predict(X)
-               
-        proba = model.predict_proba(X)
-
-        # with urllib.request.urlopen(f"https://ocp7-assia-latti.herokuapp.com/prediction_credit/{id_client}") as url:
-        #     X = json.loads(url.read())
-
-        # prediction = X['prediction']
-        # proba = X['proba']
+        prediction = X['prediction']
+        proba = X['proba']
 
         
 
