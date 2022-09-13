@@ -11,7 +11,7 @@ import plotly as py
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.figure_factory as ff
-import urllib3.request, json
+import urllib.request, json
 
 
 import warnings
@@ -47,7 +47,7 @@ try:
 
         data = pd.read_csv('app_test.csv')
 
-        with urllib3.request.urlopen(f"https://ocp7-assia-latti.herokuapp.com/prediction_credit/{id_client}") as url:
+        with urllib.request.urlopen(f"https://ocp7-assia-latti.herokuapp.com/prediction_credit/{id_client}") as url:
             X = json.loads(url.read())
 
         prediction = X['prediction']
