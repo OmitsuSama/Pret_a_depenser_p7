@@ -11,6 +11,8 @@ import plotly as py
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.figure_factory as ff
+import urllib.request, json
+
 
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -27,22 +29,28 @@ try:
     id_client = st.selectbox(
         "Choisissez un id client :", list(df.index)
     )
-    if not id_client:
-        st.error("Choisissez un id client.")
-    else:
-        model = pickle.load(open('ModelClassifier.pkl', 'rb'))
+    if id_client:
+        
+        # model = pickle.load(open('ModelClassifier.pkl', 'rb'))
         data = pd.read_csv('app_test.csv')
 
-        X = data[data['SK_ID_CURR'] == id_client]
+        # X = data[data['SK_ID_CURR'] == id_client]
         
-        notimportant_features = ['SK_ID_CURR', 'INDEX', 'TARGET']
-        selected_features = [col for col in data.columns if col not in notimportant_features]
+        # notimportant_features = ['SK_ID_CURR', 'INDEX', 'TARGET']
+        # selected_features = [col for col in data.columns if col not in notimportant_features]
         
-        X = X[selected_features]
+        # X = X[selected_features]
 
-        prediction = model.predict(X)
+        # prediction = model.predict(X)
                
-        proba = model.predict_proba(X)
+        # proba = model.predict_proba(X)
+
+        with urllib.request.urlopen(f"https://ocp7-assia-latti.herokuapp.com/prediction_credit/{id_client}") as url:
+            X = json.loads(url.read())
+
+        prediction = X['prediction']
+        proba = X['proba']
+
         
 
         tab1, tab2, tab3, tab4 = st.tabs(["Avis", "Infos Clients", "Graphique", "Plus d'info"])
@@ -50,13 +58,13 @@ try:
             if prediction == 0 :
                 prob, pred = st.columns(2)
                 with prob :
-                    st.success(f"Probabilités de remboursement : {round(proba[0][0]*100, 2)} %")
+                    st.success(f"Probabilités de remboursement : {round(proba*100, 2)} %")
                 with pred :
                     st.markdown("<h2 style='text-align: center; color: #44be6e;'>AVIS FAVORABLE</h2>", unsafe_allow_html=True)
             else :
                 prob, pred = st.columns(2)
                 with prob :
-                    st.error(f"Probabilités de remboursement : {round(proba[0][0]*100, 2)} %")
+                    st.error(f"Probabilités de remboursement : {round(proba*100, 2)} %")
                 with pred :
                     st.markdown("<h2 style='text-align: center; color: #ff3d41;'>AVIS DÉFAVORABLE</h2>", unsafe_allow_html=True)
             
@@ -118,7 +126,9 @@ try:
                 fig = ff.create_distplot([x1, x2], group_labels, bin_size=.5,
                                         colors=colors, show_hist=False, show_rug=False)
                 x3= data[data['SK_ID_CURR'] == id_client][x_val]
-                fig.add_vline(x=x3[0], line_color="green", annotation_text="Individu", annotation_position="top right")
+                monid = int(x3.index[0])
+                # st.write(monid)
+                fig.add_vline(x=x3[monid], line_color="green", annotation_text="Individu", annotation_position="top right")
                 # fig = px.histogram(data, x=x_val, color=data["TARGET"])
                 st.write(fig)
 
@@ -160,6 +170,8 @@ try:
                 fig.add_trace(go.Pie(labels=labels, values=val[:-1], hole=.6, marker_colors=colors), 1, 3)
             fig.update_layout(annotations=[dict(text='Score 1', x=0.08, y=0.5, font_size=20, showarrow=False),dict(text='Score 2', x=0.5, y=0.5, font_size=20, showarrow=False),dict(text='Score 3', x=0.92, y=0.5, font_size=20, showarrow=False)])
             st.write(fig)
+    else:
+        st.error("Choisissez un id client.")
 
 except URLError as e:
     st.error(
