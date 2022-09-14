@@ -132,14 +132,26 @@ try:
             
             with soustab3:
                 model = joblib.load(open('Model.joblib', 'rb'))
-                feature_imp = pd.DataFrame(sorted(zip(model.steps[1][1].feature_importances_,X.columns)), columns=['Value','Feature'])
-
-                plt.figure(figsize=(20, 10))
-                sns.barplot(x="Value", y="Feature", data=feature_imp[feature_imp["Value"]>2500].sort_values(by="Value", ascending=False))
-                plt.title('LightGBM Features (avg over folds)')
-                plt.tight_layout()
-                plt.show()
-                st.pyplot(plt)
+                response = requests.get("https://ocp7-assia-latti.herokuapp.com/features")
+                features = response.json()
+                values = list(features)
+                abs=[]
+                ord=[]
+                for i in range(1,16):
+                    abs.append(features['data'][i][1])
+                    ord.append(features['data'][i][0]*100)
+                
+                fig = px.bar(x=abs, y=ord, orientation='v', color=ord, color_continuous_scale='RdBu',title='<b>Features importance</b>', labels={'x':'Nom des features', 'y' : 'Importance des features en %'}, height=800, width=1000)
+                fig.update_layout(
+                    title={
+                        'text': "<b style='font-size: 20px; font-weight: bold;'>Importance des features en %</b>",
+                        'y':0.9,
+                        'x':0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'top'
+                        })
+                plt.figure(figsize=(30, 20))
+                st.write(fig)
 
 
 
