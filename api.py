@@ -34,6 +34,7 @@ def features():
     X = X[selected_features]
     feature_imp = pd.DataFrame(sorted(zip(model.steps[1][1].feature_importances_,X.columns)), columns=['Value','Feature'])
     feature_imp = feature_imp[feature_imp["Value"]>2500].sort_values(by="Value", ascending=False)
+    feature_imp["Value"] = feature_imp["Value"] / feature_imp["Value"].sum()
     result = feature_imp.to_json(orient="split")
     parsed = json.loads(result)
     return json.dumps(parsed, indent=4)
