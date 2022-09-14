@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import joblib
 import pickle
+import seaborn as sns
 from urllib.error import URLError
 import altair as alt
 import plotly.express as px  
@@ -13,6 +14,7 @@ from plotly.subplots import make_subplots
 import plotly.figure_factory as ff
 import urllib.request, json
 import requests
+import eli5
 
 
 
@@ -95,30 +97,29 @@ try:
             st.markdown("***")
 
         with tab4:
-            soustab1, soustab2 = st.tabs(["Analyse Bivariée", "Analyse Univariée"])
-
+            soustab1, soustab2, soustab3 = st.tabs(["Analyse Bivariée", "Analyse Univariée", "Feature Importance"])
+            data["DAYS_BIRTH"]= abs(data["DAYS_BIRTH"]/365)
             with soustab1:    
                 def interactive_plot():
                     col1, col2 = st.columns(2)
                     
-                    x_axis_val = col1.selectbox('Select the X-axis', options=["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3", "PAYMANT_RATE", "AMT_CREDIT", "AMT_ANNUITY", "DAYS_BIRTH"])
-                    y_axis_val = col2.selectbox('Select the Y-axis', options=["EXT_SOURCE_2", "EXT_SOURCE_1", "EXT_SOURCE_3", "PAYMANT_RATE", "AMT_CREDIT", "AMT_ANNUITY", "DAYS_BIRTH"])
+                    x_axis_val = col1.selectbox('Select the X-axis', options=["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3", "CREDIT_TO_ANNUITY_RATIO", "AMT_CREDIT", "AMT_ANNUITY", "DAYS_BIRTH"])
+                    y_axis_val = col2.selectbox('Select the Y-axis', options=["EXT_SOURCE_2", "EXT_SOURCE_1", "EXT_SOURCE_3", "CREDIT_TO_ANNUITY_RATIO", "AMT_CREDIT", "AMT_ANNUITY", "DAYS_BIRTH"])
 
                     plot = px.scatter(data, x=x_axis_val, y=y_axis_val, color='TARGET')
                     st.plotly_chart(plot, use_container_width=True)
                 interactive_plot()
 
             with soustab2:
+                
                 x_val = st.selectbox(
-                    'Selection du X', ["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3", "PAYMANT_RATE", "AMT_CREDIT", "AMT_ANNUITY", "DAYS_BIRTH"]
+                    'Selection du X', ["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3", "CREDIT_TO_ANNUITY_RATIO", "AMT_CREDIT", "AMT_ANNUITY", "DAYS_BIRTH"]
                     )            
                 x1 = data[data["TARGET"] == 0][x_val]
-                x2 = data[data["TARGET"] == 1][x_val]
                 x2 = data[data["TARGET"] == 1][x_val]
                 group_labels = ['0', '1']
 
                 colors = ['slategray', 'magenta']
-
                 # Create distplot with curve_type set to 'normal'
                 fig = ff.create_distplot([x1, x2], group_labels, bin_size=.5,
                                         colors=colors, show_hist=False, show_rug=False)
@@ -128,6 +129,19 @@ try:
                 fig.add_vline(x=x3[monid], line_color="green", annotation_text="Individu", annotation_position="top right")
                 # fig = px.histogram(data, x=x_val, color=data["TARGET"])
                 st.write(fig)
+            
+            with soustab3:
+                model = joblib.load(open('Model.joblib', 'rb'))
+                feature_imp = pd.DataFrame(sorted(zip(model.steps[1][1].feature_importances_,X.columns)), columns=['Value','Feature'])
+
+                plt.figure(figsize=(20, 10))
+                sns.barplot(x="Value", y="Feature", data=feature_imp[feature_imp["Value"]>2500].sort_values(by="Value", ascending=False))
+                plt.title('LightGBM Features (avg over folds)')
+                plt.tight_layout()
+                plt.show()
+                st.pyplot(plt)
+
+
 
 
 
