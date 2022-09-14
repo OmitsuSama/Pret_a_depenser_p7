@@ -24,8 +24,8 @@ dict_table = {
 print(model.__dict__)
 
 app = Flask(__name__)
-@app.route("/summary")
-def summary():
+@app.route("/features")
+def features():
     model = joblib.load(open('Model.joblib', 'rb'))
     X = data
     notimportant_features = ['SK_ID_CURR', 'INDEX', 'TARGET']
@@ -33,13 +33,9 @@ def summary():
     
     X = X[selected_features]
     feature_imp = pd.DataFrame(sorted(zip(model.steps[1][1].feature_importances_,X.columns)), columns=['Value','Feature'])
-
-    plt.figure(figsize=(20, 10))
-    sns.barplot(x="Value", y="Feature", data=feature_imp[feature_imp["Value"]>2500].sort_values(by="Value", ascending=False))
-    plt.title('LightGBM Features (avg over folds)')
-    plt.tight_layout()
-    plt.show()
-    return "Test"
+    result = feature_imp.to_json(orient="split")
+    parsed = json.loads(result)
+    return json.dumps(parsed, indent=4)
 @app.route('/')
 def hello():
     return "Bienvenue, L'API est opérationnelle... tapez /prediction_credit/{id_dun_client}"
